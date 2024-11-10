@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>URL Shortener</h1>
+    
+    <% if (locals.id) { %>
+        <p>Url Generated: http://localhost:8001/url/<%= id %></p>
+    <% } %>
+    
+    <div>
+        <form method="POST" action="/url">
+            <label>Enter your original URL</label>
+            <input type="text" placeholder="https://example.com" name="url"/>
+            <button type="submit">Generate</button>
+        </form>
+    </div>
+    
+    <div>
+        <% if (locals.urls) { %>
+            <table>
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>ShortId</th>
+                        <th>Redirect</th>
+                        <th>Clicks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% urls.forEach((url, index) => { %>
+                        <tr>
+                            <td><%= index + 1 %></td>
+                            <td><%= url.shortId %></td>
+                            <td><%= url.redirectURL %></td>
+                            <td><%= url.visitHistory.length %></td>
+                            <td>
+                                <button onclick="deleteUrl('<%= url.shortId %>')">Delete</button> <!-- Delete button -->
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        <% } %>
+    </div>
+
+    <script>
+
+    async function deleteUrl(shortId) {
+        try {
+            const response = await fetch(`/url/${shortId}`, {
+                method: 'DELETE'
+            });
+            const data = await response.json();
+            if (response.ok) {
+                alert(data.message);
+                window.location.reload(); // Reload page to reflect deletion
+            } else {
+                alert(data.message || "Failed to delete URL");
+            }
+        } catch (error) {
+            console.error("Error deleting URL:", error);
+        }
+    }
+        </script>
+
+</body>
+</html>
